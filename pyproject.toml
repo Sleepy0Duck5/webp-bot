@@ -9,7 +9,6 @@ dependencies = [
     "dotenv>=0.9.9",
     "loguru>=0.7.3",
     "requests>=2.32.3",
-    "webptools>=0.0.9",
 ]
 
 [dependency-groups]

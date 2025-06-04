@@ -30,17 +30,25 @@ class WebpBot:
         """
 
         @self._bot.tree.command(
-            name="from_url", description="Convert URL based images into webp"
+            name="from_url",
+            description="Convert URL images into gif or URL mp4 into webp",
         )
         @app_commands.describe(url="URL")
         async def from_url(interaction: discord.Interaction, url: str) -> None:
-            await interaction.response.send_message("processing...", ephemeral=True)
+            await interaction.response.send_message("Processing...", ephemeral=True)
 
-            await self._handler.from_url(url=url)
+            image = None
 
-            await interaction.response.send_message(f"error raised", ephemeral=True)
-
-            # await interaction.followup.send(file=discord.File(f, temp_video_id+".gif"))
+            try:
+                image = await self._handler.from_url(url=url)
+                await interaction.followup.send(
+                    file=discord.File(image.get_path(), image.get_name())
+                )
+            except Exception as e:
+                await interaction.followup.send(f"Error raised: {e}", ephemeral=True)
+            finally:
+                if image:
+                    image.delete()
 
         @self._bot.event
         async def on_ready() -> None:
