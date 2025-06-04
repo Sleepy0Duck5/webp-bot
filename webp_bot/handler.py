@@ -31,6 +31,8 @@ class Handler:
 
     def _download_file(self, url: str):
         with tempfile.NamedTemporaryFile(delete=False) as f:
+            if not self._validate_url(url=url):
+                raise Exception(f"Invalid url({url})")
             response = requests.get(url=url)
 
             if response.status_code not in (200, 201):
@@ -41,6 +43,13 @@ class Handler:
             f.write(response.content)
             f.flush()
             return f
+
+    def _validate_url(self, url: str) -> bool:
+        try:
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except AttributeError:
+            return False
 
     def _get_original_filename_from_url(self, url: str) -> str:
         parsed = urlparse(url)
