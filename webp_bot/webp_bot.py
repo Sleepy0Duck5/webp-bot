@@ -41,6 +41,11 @@ class WebpBot:
 
             try:
                 image = await self._handler.from_url(url=url)
+                if not image:
+                    await interaction.followup.send(
+                        f"Failed to process image, maybe ffmpeg error", ephemeral=True
+                    )
+                    
                 await interaction.followup.send(
                     file=discord.File(image.get_path(), image.get_name())
                 )

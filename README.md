@@ -6,7 +6,11 @@ Discord bot to convert JPG, PNG, GIF into WEBP
 # Installation
 
 ### 1. Install requirements
-``` python
+``` shell
+# install ffmpeg (ubuntu)
+$ sudo apt install ffmpeg libwebp-dev
+
+# install python requirements
 $ uv sync
 ```
 
