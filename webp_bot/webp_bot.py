@@ -45,11 +45,12 @@ class WebpBot:
                     await interaction.followup.send(
                         f"Failed to process image, maybe ffmpeg error", ephemeral=True
                     )
-                    
+
                 await interaction.followup.send(
                     file=discord.File(image.get_path(), image.get_name())
                 )
             except Exception as e:
+                logger.opt(exception=e).error(f"Error raised: {e}")
                 await interaction.followup.send(f"Error raised: {e}", ephemeral=True)
             finally:
                 if image:
