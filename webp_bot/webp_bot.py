@@ -38,16 +38,18 @@ class WebpBot:
             await interaction.response.send_message("Processing...", ephemeral=True)
 
             image = None
+            mention = f"<@{interaction.user.id}>"
 
             try:
                 image = await self._handler.from_url(url=url)
                 if not image:
                     await interaction.followup.send(
-                        f"Failed to process image, maybe ffmpeg error", ephemeral=True
+                        "Failed to process image, maybe ffmpeg error", ephemeral=True
                     )
 
                 await interaction.followup.send(
-                    file=discord.File(image.get_path(), image.get_name())
+                    content=f"{mention}",
+                    file=discord.File(image.get_path(), image.get_name()),
                 )
             except Exception as e:
                 logger.opt(exception=e).error(f"Error raised: {e}")
