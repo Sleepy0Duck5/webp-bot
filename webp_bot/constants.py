@@ -1,5 +1,5 @@
 class Extensions:
-    WEBP_CONVERTABLE = ["mp4"]
+    WEBP_CONVERTABLE = ["mp4", "gif"]
     REPLACE_EXTENSION = ["webp", "jpg", "png", "jpeg"]
 
 
