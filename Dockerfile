@@ -14,14 +14,12 @@ WORKDIR /app
 # Copy dependency files
 COPY .python-version pyproject.toml uv.lock ./
 
-# Install dependencies using uv sync (frozen ensures it uses the lock file)
-RUN uv sync --frozen --no-dev
+# Install dependencies system-wide using uv pip
+RUN uv export --frozen --no-dev -o requirements.txt && \
+    uv pip install --system --no-cache -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
 
-# Place the virtual environment in the PATH and run python directly
-ENV PATH="/app/.venv/bin:$PATH"
-
-# Run the application
+# Run the application using the system python
 CMD ["python", "main.py"]
