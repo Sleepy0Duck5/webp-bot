@@ -20,5 +20,8 @@ RUN uv sync --frozen --no-dev
 # Copy the rest of the application
 COPY . .
 
+# Place the virtual environment in the PATH and run python directly
+ENV PATH="/app/.venv/bin:$PATH"
+
 # Run the application
-CMD ["uv", "run", "main.py"]
+CMD ["python", "main.py"]
