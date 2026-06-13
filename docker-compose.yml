@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  webp-bot:
+    build: .
+    container_name: webp-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./resources:/app/resources
