@@ -28,9 +28,9 @@ class FFmpegConverter(Converter):
 
         return WebpImage(path=result_filepath, name=random_filename, extension="webp")
 
-    def convert_multiple(self, filepaths: list[str]) -> WebpImage:
-        random_filename = f"{uuid.uuid4().hex}.webp"
-        result_filepath = os.path.join(tempfile.tempdir, random_filename)
+    def convert_multiple(self, filepaths: list[str], is_image: bool = False) -> WebpImage:
+        random_filename = uuid.uuid4().hex
+        result_filepath = os.path.join(tempfile.tempdir, f"{random_filename}.webp")
 
         w, h = map(int, VideoConvertConfigs.SIZE.split("x"))
         
@@ -41,16 +41,26 @@ class FFmpegConverter(Converter):
         
         joined = ffmpeg.filter(streams, 'hstack', inputs=len(streams))
 
-        joined.filter(
-            "fps", fps=VideoConvertConfigs.FPS
-        ).output(
-            result_filepath,
-            vcodec="libwebp",
-            lossless=1,
-            loop=0,
-            preset="default",
-            an=None,
-            vsync=0,
-        ).run()
+        if is_image:
+            joined.output(
+                result_filepath,
+                vcodec="libwebp",
+                lossless=1,
+                vframes=1,
+            ).run()
+            extension = "gif"
+        else:
+            joined.filter(
+                "fps", fps=VideoConvertConfigs.FPS
+            ).output(
+                result_filepath,
+                vcodec="libwebp",
+                lossless=1,
+                loop=0,
+                preset="default",
+                an=None,
+                vsync=0,
+            ).run()
+            extension = "webp"
 
-        return WebpImage(path=result_filepath, name=random_filename, extension="webp")
+        return WebpImage(path=result_filepath, name=random_filename, extension=extension)

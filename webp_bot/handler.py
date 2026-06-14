@@ -38,6 +38,7 @@ class Handler:
     async def from_urls(self, urls: list[str]) -> Image:
         files = []
         try:
+            are_all_images = True
             for url in urls:
                 downloader: Downloader = self._downloader_factory.create(url=url)
                 file = downloader.download_file(url=url)
@@ -45,11 +46,14 @@ class Handler:
                 
                 if extension not in Extensions.REPLACE_EXTENSIONS and extension not in Extensions.WEBP_CONVERTABLE:
                     raise Exception(f"Failed to convert webp image: {extension}")
+                
+                if extension not in Extensions.REPLACE_EXTENSIONS:
+                    are_all_images = False
                     
                 files.append(file)
             
             filepaths = [f.name for f in files]
-            return self._converter.convert_multiple(filepaths=filepaths)
+            return self._converter.convert_multiple(filepaths=filepaths, is_image=are_all_images)
         finally:
             for f in files:
                 try:
