@@ -35,6 +35,28 @@ class Handler:
                 Image(path=file.name, name=original_filename, extension="gif").delete()
             raise Exception(f"Failed to convert webp image: {extension}")
 
+    async def from_urls(self, urls: list[str]) -> Image:
+        files = []
+        try:
+            for url in urls:
+                downloader: Downloader = self._downloader_factory.create(url=url)
+                file = downloader.download_file(url=url)
+                extension = self._get_extension(filename=file.name, url=url)
+                
+                if extension not in Extensions.REPLACE_EXTENSIONS and extension not in Extensions.WEBP_CONVERTABLE:
+                    raise Exception(f"Failed to convert webp image: {extension}")
+                    
+                files.append(file)
+            
+            filepaths = [f.name for f in files]
+            return self._converter.convert_multiple(filepaths=filepaths)
+        finally:
+            for f in files:
+                try:
+                    os.unlink(f.name)
+                except Exception:
+                    pass
+
     def _download_file(self, url: str) -> tempfile._TemporaryFileWrapper:
         with tempfile.NamedTemporaryFile(delete=False) as f:
             response = requests.get(url=url)

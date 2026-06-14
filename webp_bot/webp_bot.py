@@ -31,17 +31,22 @@ class WebpBot:
 
         @self._bot.tree.command(
             name="from_url",
-            description="Convert URL images into gif or URL mp4 into webp",
+            description="Convert up to 3 URL images/mp4s into a single webp side-by-side",
         )
-        @app_commands.describe(url="URL")
-        async def from_url(interaction: discord.Interaction, url: str) -> None:
+        @app_commands.describe(url="URL 1", url2="URL 2 (Optional)", url3="URL 3 (Optional)")
+        async def from_url(interaction: discord.Interaction, url: str, url2: str = None, url3: str = None) -> None:
             await interaction.response.send_message("Processing...", ephemeral=True)
 
             image = None
             mention = f"<@{interaction.user.id}>"
+            urls = [u for u in [url, url2, url3] if u]
 
             try:
-                image = await self._handler.from_url(url=url)
+                if len(urls) == 1:
+                    image = await self._handler.from_url(url=urls[0])
+                else:
+                    image = await self._handler.from_urls(urls=urls)
+
                 if not image:
                     await interaction.followup.send(
                         "Failed to process image, maybe ffmpeg error", ephemeral=True

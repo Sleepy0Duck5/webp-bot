@@ -27,3 +27,30 @@ class FFmpegConverter(Converter):
         ).run()
 
         return WebpImage(path=result_filepath, name=random_filename, extension="webp")
+
+    def convert_multiple(self, filepaths: list[str]) -> WebpImage:
+        random_filename = f"{uuid.uuid4().hex}.webp"
+        result_filepath = os.path.join(tempfile.tempdir, random_filename)
+
+        w, h = map(int, VideoConvertConfigs.SIZE.split("x"))
+        
+        streams = [
+            ffmpeg.input(filename=filepath).filter('scale', w=w, h=h)
+            for filepath in filepaths
+        ]
+        
+        joined = ffmpeg.filter(streams, 'hstack', inputs=len(streams))
+
+        joined.filter(
+            "fps", fps=VideoConvertConfigs.FPS
+        ).output(
+            result_filepath,
+            vcodec="libwebp",
+            lossless=1,
+            loop=0,
+            preset="default",
+            an=None,
+            vsync=0,
+        ).run()
+
+        return WebpImage(path=result_filepath, name=random_filename, extension="webp")
